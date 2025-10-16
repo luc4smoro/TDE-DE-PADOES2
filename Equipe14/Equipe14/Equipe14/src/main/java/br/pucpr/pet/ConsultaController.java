@@ -34,6 +34,7 @@ public class ConsultaController extends Application {
     private final TextField txtIdVeterinario = new TextField();
     private final DatePicker datePicker = new DatePicker();
     private final TextField txtHora = new TextField();
+    private final TextField txtValor = new TextField();
     private final ComboBox<StatusConsulta> cmbStatus = new ComboBox<>(FXCollections.observableArrayList(StatusConsulta.values()));
 
     // Botões
@@ -98,6 +99,8 @@ public class ConsultaController extends Application {
                 datePicker,
                 new Label("Hora (HH:mm):"),
                 txtHora,
+                new Label("Valor (R$):"),
+                txtValor,
                 new Label("Status:"),
                 cmbStatus
         );
@@ -108,6 +111,8 @@ public class ConsultaController extends Application {
         txtIdPet.setPromptText("Ex: 1");
         txtIdVeterinario.setPromptText("Ex: 1");
         txtHora.setPromptText("Ex: 14:30");
+        txtValor.setPromptText("Ex: 150.00");
+
 
         // Área dos botões
         HBox areaBotoes = new HBox(5);
@@ -159,7 +164,11 @@ public class ConsultaController extends Application {
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colStatus.setPrefWidth(120);
 
-        tabelaConsultas.getColumns().addAll(colId, colIdPet, colIdVet, colData, colHora, colStatus);
+        TableColumn<Consulta, Double> colValor = new TableColumn<>("Valor (R$)");
+        colValor.setCellValueFactory(new PropertyValueFactory<>("valor"));
+        colValor.setPrefWidth(100);
+
+        tabelaConsultas.getColumns().addAll(colId, colIdPet, colIdVet, colData, colHora, colStatus, colValor);
 
         // Evento de seleção na tabela (clique simples para preencher formulário)
         tabelaConsultas.getSelectionModel().selectedItemProperty().addListener(
@@ -323,6 +332,14 @@ public class ConsultaController extends Application {
 
         consulta.setHora(txtHora.getText().trim());
 
+        if (!txtValor.getText().trim().isEmpty()) {
+            try {
+                consulta.setValor(Double.parseDouble(txtValor.getText().trim()));
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Valor da consulta inválido!");
+            }
+        }
+
         // Se for uma nova consulta (sem ID), o status é sempre CRIADA
         if (txtId.getText().trim().isEmpty()) {
             consulta.setStatus(StatusConsulta.CRIADA);
@@ -343,6 +360,7 @@ public class ConsultaController extends Application {
         }
 
         txtHora.setText(consulta.getHora());
+        txtValor.setText(String.valueOf(consulta.getValor()));
         // Garante que o status não é nulo ao preencher o ComboBox
         cmbStatus.setValue(consulta.getStatus() != null ? consulta.getStatus() : StatusConsulta.CRIADA);
         cmbStatus.setDisable(true); // Mantém o status desabilitado
@@ -354,6 +372,7 @@ public class ConsultaController extends Application {
         txtIdVeterinario.clear();
         datePicker.setValue(null);
         txtHora.clear();
+        txtValor.clear();
         cmbStatus.setValue(StatusConsulta.CRIADA); // Resetar para o status padrão
         cmbStatus.setDisable(true); // Desabilita na criação de nova consulta
         tabelaConsultas.getSelectionModel().clearSelection();
@@ -574,14 +593,63 @@ public class ConsultaController extends Application {
 
         Label lblVeterinario = new Label("Veterinário ID: " + consulta.getId_veterinario());
 
-        // Carregar diagnóstico
         Optional<Diagnostico> diagnosticoOpt = carregarDiagnosticoDaConsulta(consulta.getId_consulta());
-        String nomeDiagnostico = diagnosticoOpt.map(Diagnostico::getNomeDiagnostico).orElse("[Não encontrado]");
-        String prescricoes = diagnosticoOpt.map(Diagnostico::getMedicamentosPrescritos).orElse("[Não encontrado]");
 
         TextArea txtObservacoes = new TextArea(consulta.getObservacoes(StatusConsulta.FINALIZADA));
         txtObservacoes.setEditable(false);
         txtObservacoes.setPrefRowCount(3);
+
+        // --- Seção de Pagamento ---
+        VBox secaoPagamento = new VBox(5);
+        secaoPagamento.setPadding(new Insets(10, 0, 0, 0));
+        secaoPagamento.setStyle("-fx-border-color: #ccc; -fx-border-width: 1 0 0 0; -fx-padding: 10 0 0 0;");
+        Label lblPagamento = new Label("Pagamento da Consulta");
+        lblPagamento.setStyle("-fx-font-weight: bold;");
+
+        TextField txtValorConsulta = new TextField(String.valueOf(consulta.getValor()));
+        txtValorConsulta.setPromptText("Valor da Consulta (Ex: 150.00)");
+
+        ComboBox<String> cmbFormaPagamento = new ComboBox<>(FXCollections.observableArrayList("Cartao", "Pix", "Dinheiro"));
+        cmbFormaPagamento.setPromptText("Selecione a forma de pagamento");
+
+        Button btnPagar = new Button("Efetuar Pagamento");
+        btnPagar.setOnAction(e -> {
+            try {
+                double valor = Double.parseDouble(txtValorConsulta.getText());
+                String formaPagamento = cmbFormaPagamento.getValue();
+
+                if (formaPagamento == null) {
+                    mostrarAviso("Selecione uma forma de pagamento.");
+                    return;
+                }
+
+                consulta.setValor(valor);
+
+                switch (formaPagamento) {
+                    case "Cartao":
+                        consulta.setPagamentoStrategy(new PagamentoCartao());
+                        break;
+                    case "Pix":
+                        consulta.setPagamentoStrategy(new PagamentoPix());
+                        break;
+                    case "Dinheiro":
+                        consulta.setPagamentoStrategy(new PagamentoDinheiro());
+                        break;
+                }
+
+                String resultadoPagamento = consulta.pagar();
+                mostrarSucesso(resultadoPagamento);
+
+                // Salva o valor da consulta
+                atualizarConsultaNoDataManager(consulta, fluxoStage);
+
+            } catch (NumberFormatException ex) {
+                mostrarErro("Valor inválido. Insira um número.");
+            }
+        });
+
+        secaoPagamento.getChildren().addAll(lblPagamento, new Label("Valor:"), txtValorConsulta, new Label("Forma de Pagamento:"), cmbFormaPagamento, btnPagar);
+
 
         HBox botoesAcao = new HBox(10);
         botoesAcao.setAlignment(Pos.CENTER);
@@ -590,11 +658,11 @@ public class ConsultaController extends Application {
         Button btnReabrir = new Button("↩️ Reabrir Consulta");
 
         btnGerarRelatorio.setOnAction(e -> gerarRelatorio(consulta, diagnosticoOpt));
-         btnReabrir.setOnAction(e -> atualizarStatusConsulta(consulta, StatusConsulta.EM_ANDAMENTO, fluxoStage));
+        btnReabrir.setOnAction(e -> atualizarStatusConsulta(consulta, StatusConsulta.EM_ANDAMENTO, fluxoStage));
 
         botoesAcao.getChildren().addAll(btnGerarRelatorio, btnReabrir);
 
-        layout.getChildren().addAll(lblStatus, lblInicioFim, lblVeterinario, new Label("Observações:"), txtObservacoes, botoesAcao);
+        layout.getChildren().addAll(lblStatus, lblInicioFim, lblVeterinario, new Label("Observações:"), txtObservacoes, botoesAcao, secaoPagamento);
         return layout;
     }
 

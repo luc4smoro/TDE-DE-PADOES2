@@ -17,6 +17,9 @@ public class Consulta implements Serializable {
     private LocalDateTime data; // Data e hora agendada
     private String hora; // Hora agendada (redundante com LocalDateTime, mas mantido por compatibilidade)
     private StatusConsulta status;
+    private double valor;
+    private transient PagamentoStrategy pagamentoStrategy;
+
 
     // Novos campos para o fluxo de estados
     private LocalDateTime dataInicioReal; // Data e hora real de início da consulta
@@ -67,6 +70,26 @@ public class Consulta implements Serializable {
 
     public StatusConsulta getStatus() { return status; }
     public void setStatus(StatusConsulta status) { this.status = status; }
+
+    public double getValor() {
+        return valor;
+    }
+
+    public void setValor(double valor) {
+        this.valor = valor;
+    }
+
+    public void setPagamentoStrategy(PagamentoStrategy pagamentoStrategy) {
+        this.pagamentoStrategy = pagamentoStrategy;
+    }
+
+    public String pagar() {
+        if (pagamentoStrategy == null) {
+            return "Forma de pagamento não definida.";
+        }
+        return pagamentoStrategy.pagar(valor);
+    }
+
 
     // Getters e Setters para os novos campos
     public LocalDateTime getDataInicioReal() { return dataInicioReal; }
