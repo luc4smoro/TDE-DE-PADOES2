@@ -1,22 +1,29 @@
 package br.pucpr.pet;
 
 import javafx.stage.Stage;
+import java.time.LocalDateTime;
 
-public class CanceladaState implements ConsultaState {
+public class AgendadaState implements ConsultaState {
 
     @Override
     public void iniciar(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Não é possível iniciar uma consulta cancelada. Reagende-a primeiro.");
+        consulta.setDataInicioReal(LocalDateTime.now());
+        consulta.setStatus(StatusConsulta.EM_ANDAMENTO);
+        controller.atualizarConsultaNoDataManager(consulta, fluxoStage);
+        controller.mostrarSucesso("Consulta iniciada com sucesso!");
+        if (fluxoStage != null) {
+            fluxoStage.close();
+        }
     }
 
     @Override
     public void finalizar(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Não é possível finalizar uma consulta cancelada.");
+        controller.mostrarAviso("Não é possível finalizar uma consulta que ainda não foi iniciada.");
     }
 
     @Override
     public void cancelar(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("A consulta já está cancelada.");
+        controller.mostrarDialogoCancelamento(consulta, fluxoStage);
     }
 
     @Override
@@ -26,26 +33,26 @@ public class CanceladaState implements ConsultaState {
 
     @Override
     public void reabrir(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Não é possível reabrir uma consulta cancelada.");
+        controller.mostrarAviso("A consulta está agendada e ainda não foi finalizada para ser reaberta.");
     }
 
     @Override
     public void abrirFichaAtendimento(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Não há ficha de atendimento para uma consulta cancelada.");
+        controller.mostrarAviso("A ficha de atendimento só pode ser aberta para consultas em andamento.");
     }
 
     @Override
     public void gerarRelatorio(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Não é possível gerar relatório para uma consulta cancelada.");
+        controller.mostrarAviso("Relatório só pode ser gerado para consultas 'Finalizadas'.");
     }
 
     @Override
     public void visualizarDiagnostico(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Não há diagnóstico para uma consulta cancelada.");
+        controller.mostrarAviso("Diagnóstico só pode ser visualizado para consultas 'Finalizadas'.");
     }
 
     @Override
     public StatusConsulta getStatusEnum() {
-        return StatusConsulta.CANCELADA;
+        return StatusConsulta.AGENDADA;
     }
 }
