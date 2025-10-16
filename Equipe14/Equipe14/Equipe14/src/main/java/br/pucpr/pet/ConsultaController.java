@@ -199,10 +199,17 @@ public class ConsultaController extends Application {
     }
 
     private void configurarEventos() {
-        btnInserir.setOnAction(e -> inserirConsulta());
-        btnAtualizar.setOnAction(e -> atualizarConsulta());
-        btnExcluir.setOnAction(e -> excluirConsulta());
-        btnLimpar.setOnAction(e -> limparFormulario());
+        // Padrão Command: Encapsula a ação em um objeto, desacoplando o solicitante da ação do executor.
+        Command inserirCommand = new InserirConsultaCommand(this);
+        Command atualizarCommand = new AtualizarConsultaCommand(this);
+        Command excluirCommand = new ExcluirConsultaCommand(this);
+        Command limparCommand = new LimparFormularioCommand(this);
+
+        // Configura os botões para executarem os comandos
+        btnInserir.setOnAction(e -> inserirCommand.execute());
+        btnAtualizar.setOnAction(e -> atualizarCommand.execute());
+        btnExcluir.setOnAction(e -> excluirCommand.execute());
+        btnLimpar.setOnAction(e -> limparCommand.execute());
         btnAtualizar_lista.setOnAction(e -> atualizarTabela());
     }
 
@@ -966,6 +973,85 @@ public class ConsultaController extends Application {
         alert.setContentText(mensagem);
         alert.showAndWait();
     }
+
+    // --- Padrão Command ---
+    // O padrão Command encapsula uma solicitação como um objeto, permitindo que você
+    // parametrize clientes com diferentes solicitações, enfileire ou registre solicitações
+    // e suporte operações que podem ser desfeitas.
+    // Aqui, cada ação do botão (inserir, atualizar, etc.) é encapsulada em seu próprio objeto de comando.
+
+    /**
+     * Interface para o padrão de projeto Command.
+     * Define um único método, execute(), que encapsula a ação a ser realizada.
+     */
+    private interface Command {
+        void execute();
+    }
+
+    /**
+     * Comando concreto para a ação de inserir uma nova consulta.
+     */
+    private class InserirConsultaCommand implements Command {
+        private final ConsultaController controller;
+
+        public InserirConsultaCommand(ConsultaController controller) {
+            this.controller = controller;
+        }
+
+        @Override
+        public void execute() {
+            controller.inserirConsulta();
+        }
+    }
+
+    /**
+     * Comando concreto para a ação de atualizar uma consulta existente.
+     */
+    private class AtualizarConsultaCommand implements Command {
+        private final ConsultaController controller;
+
+        public AtualizarConsultaCommand(ConsultaController controller) {
+            this.controller = controller;
+        }
+
+        @Override
+        public void execute() {
+            controller.atualizarConsulta();
+        }
+    }
+
+    /**
+     * Comando concreto para a ação de excluir uma consulta.
+     */
+    private class ExcluirConsultaCommand implements Command {
+        private final ConsultaController controller;
+
+        public ExcluirConsultaCommand(ConsultaController controller) {
+            this.controller = controller;
+        }
+
+        @Override
+        public void execute() {
+            controller.excluirConsulta();
+        }
+    }
+
+    /**
+     * Comando concreto para a ação de limpar os campos do formulário.
+     */
+    private class LimparFormularioCommand implements Command {
+        private final ConsultaController controller;
+
+        public LimparFormularioCommand(ConsultaController controller) {
+            this.controller = controller;
+        }
+
+        @Override
+        public void execute() {
+            controller.limparFormulario();
+        }
+    }
+    // --- Fim do Padrão Command ---
 
     public static void main(String[] args) {
         launch(args);
