@@ -1,13 +1,12 @@
 package br.pucpr.pet;
 
 import javafx.stage.Stage;
-import java.util.Optional;
 
 public class FinalizadaState implements ConsultaState {
 
     @Override
     public void iniciar(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Esta consulta já foi finalizada. Para continuar, você pode reabri-la.");
+        controller.mostrarAviso("A consulta já foi finalizada. Não pode ser iniciada novamente.");
     }
 
     @Override
@@ -17,43 +16,36 @@ public class FinalizadaState implements ConsultaState {
 
     @Override
     public void cancelar(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Não é possível cancelar uma consulta que já foi finalizada.");
+        controller.mostrarAviso("Não é possível cancelar uma consulta finalizada.");
     }
 
     @Override
     public void reagendar(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Não é possível reagendar uma consulta que já foi finalizada.");
+        controller.mostrarAviso("Não é possível reagendar uma consulta finalizada.");
     }
 
     @Override
     public void reabrir(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
+        // Permite reabrir a consulta, voltando para o estado EM_ANDAMENTO
         consulta.setStatus(StatusConsulta.EM_ANDAMENTO);
         controller.atualizarConsultaNoDataManager(consulta, fluxoStage);
-        controller.mostrarSucesso("Consulta reaberta com sucesso!");
-        if (fluxoStage != null) {
-            fluxoStage.close();
-        }
+        controller.mostrarSucesso("Consulta reaberta para 'Em Andamento'.");
+        fluxoStage.close();
     }
 
     @Override
     public void abrirFichaAtendimento(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("A ficha de atendimento não pode ser editada para uma consulta finalizada. Visualize o diagnóstico.");
+        controller.abrirDiagnosticoController(consulta.getId_consulta()); // Pode abrir para visualização ou edição se reaberta
     }
 
     @Override
     public void gerarRelatorio(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        // A lógica de gerar relatório está no controller, aqui apenas delegamos.
-        // O controller precisa de um método público para isso.
-        // Por simplicidade, vamos assumir que o controller tem um método para isso.
-        // controller.gerarRelatorioDaConsulta(consulta);
-        controller.mostrarAlerta("Gerando Relatório", "A funcionalidade de gerar relatório foi invocada.");
+        controller.mostrarAlerta("Funcionalidade", "Gerar Relatório/Recibo - Não implementado.");
     }
 
     @Override
     public void visualizarDiagnostico(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        // A lógica de visualização está no controller, aqui apenas delegamos.
-        // controller.visualizarDiagnosticoDaConsulta(consulta);
-        controller.mostrarAlerta("Visualizando Diagnóstico", "A funcionalidade de visualizar diagnóstico foi invocada.");
+        controller.mostrarAlerta("Funcionalidade", "Visualizar Diagnóstico - Não implementado.");
     }
 
     @Override

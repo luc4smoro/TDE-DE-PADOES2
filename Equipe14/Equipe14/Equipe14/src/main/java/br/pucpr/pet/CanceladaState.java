@@ -6,7 +6,7 @@ public class CanceladaState implements ConsultaState {
 
     @Override
     public void iniciar(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Não é possível iniciar uma consulta cancelada. Reagende-a primeiro.");
+        controller.mostrarAviso("Não é possível iniciar uma consulta cancelada.");
     }
 
     @Override
@@ -26,7 +26,7 @@ public class CanceladaState implements ConsultaState {
 
     @Override
     public void reabrir(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Não é possível reabrir uma consulta cancelada.");
+        controller.mostrarAviso("Para reabrir, reagende a consulta.");
     }
 
     @Override
@@ -36,7 +36,7 @@ public class CanceladaState implements ConsultaState {
 
     @Override
     public void gerarRelatorio(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("Não é possível gerar relatório para uma consulta cancelada.");
+        controller.mostrarAviso("Não há relatório para uma consulta cancelada.");
     }
 
     @Override

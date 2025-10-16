@@ -1,24 +1,18 @@
 package br.pucpr.pet;
 
 import javafx.stage.Stage;
-import java.time.LocalDateTime;
 
 public class ReagendadaState implements ConsultaState {
 
     @Override
     public void iniciar(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        consulta.setDataInicioReal(LocalDateTime.now());
-        consulta.setStatus(StatusConsulta.EM_ANDAMENTO);
-        controller.atualizarConsultaNoDataManager(consulta, fluxoStage);
-        controller.mostrarSucesso("Consulta iniciada com sucesso!");
-        if (fluxoStage != null) {
-            fluxoStage.close();
-        }
+        controller.mostrarAviso("A consulta foi reagendada. Inicie-a na nova data/hora.");
+        // Opcional: permitir iniciar se a nova data/hora for agora
     }
 
     @Override
     public void finalizar(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("A consulta precisa ser iniciada antes de ser finalizada.");
+        controller.mostrarAviso("A consulta reagendada ainda não foi iniciada para ser finalizada.");
     }
 
     @Override
@@ -33,12 +27,12 @@ public class ReagendadaState implements ConsultaState {
 
     @Override
     public void reabrir(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("A consulta ainda não foi finalizada para ser reaberta.");
+        controller.mostrarAviso("A consulta reagendada não pode ser reaberta diretamente.");
     }
 
     @Override
     public void abrirFichaAtendimento(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("A ficha de atendimento só pode ser aberta para consultas em andamento.");
+        controller.mostrarAviso("Não há ficha de atendimento para uma consulta reagendada que não foi iniciada.");
     }
 
     @Override

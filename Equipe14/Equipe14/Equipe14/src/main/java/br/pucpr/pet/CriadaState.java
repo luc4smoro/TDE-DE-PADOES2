@@ -11,14 +11,12 @@ public class CriadaState implements ConsultaState {
         consulta.setStatus(StatusConsulta.EM_ANDAMENTO);
         controller.atualizarConsultaNoDataManager(consulta, fluxoStage);
         controller.mostrarSucesso("Consulta iniciada com sucesso!");
-        if (fluxoStage != null) {
-            fluxoStage.close();
-        }
+        fluxoStage.close();
     }
 
     @Override
     public void finalizar(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("A consulta precisa ser iniciada antes de ser finalizada.");
+        controller.mostrarAviso("A consulta ainda não foi iniciada.");
     }
 
     @Override
@@ -33,12 +31,12 @@ public class CriadaState implements ConsultaState {
 
     @Override
     public void reabrir(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("A consulta ainda não foi finalizada para ser reaberta.");
+        controller.mostrarAviso("A consulta não pode ser reaberta do estado 'Criada'.");
     }
 
     @Override
     public void abrirFichaAtendimento(Consulta consulta, ConsultaController controller, Stage fluxoStage) {
-        controller.mostrarAviso("A ficha de atendimento só pode ser aberta para consultas em andamento.");
+        controller.mostrarAviso("A ficha de atendimento só pode ser aberta quando a consulta estiver 'Em Andamento'.");
     }
 
     @Override
