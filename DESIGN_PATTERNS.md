@@ -1,3 +1,9 @@
+# Projeto RA2 - Equipe 9 - Rodrigo Petters Sardagna e Lucas Schapiewski Moro
+
+Este projeto é um sistema de gerenciamento para uma clínica veterinária, focado no agendamento e controle de consultas.
+
+---
+
 ### **Documento de Análise de Padrões de Projeto – Sistema de Clínica Veterinária**
 
 Este documento detalha os padrões de projeto de software identificados no código-fonte do sistema de gerenciamento de consultas veterinárias. Para cada padrão, explicamos por que ele foi utilizado, seus benefícios e os possíveis pontos negativos no contexto desta aplicação.
