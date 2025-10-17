@@ -71,3 +71,18 @@ Este documento detalha os padrões de projeto de software identificados no códi
 
 *   **Malefícios:**
     *   **Aumento do Número de Classes:** A principal desvantagem, agora mais evidente, é que cada nova ação requer a criação de uma nova classe. Para ações muito simples, isso pode parecer um excesso de código (boilerplate), mas é uma troca consciente em favor de um design mais flexível e desacoplado.
+
+---
+
+### **Maiores Dificuldades no Projeto**
+
+*   **Dividir as Tarefas:** Foi bem difícil organizar o que cada um ia fazer. Muitas vezes, uma tarefa dependia da outra, então um de nós ficava parado esperando o outro terminar. A gente precisou conversar o tempo todo para não atrapalhar um ao outro.
+
+*   **Identificar Novas Funcionalidades:** Enquanto a gente arrumava o código, apareciam várias ideias de coisas novas que poderíamos adicionar. A dificuldade foi decidir se a gente focava só em arrumar o que já existia ou se já implementava essas novidades, o que poderia atrasar o trabalho.
+
+*   **Compreender e Aplicar os Padrões:** Primeiro, tivemos que estudar bastante para entender bem os padrões. Depois, o mais difícil foi olhar para o código antigo e sacar o lugar certo para usar cada padrão. A gente ficou com medo de escolher o padrão errado e acabar complicando mais o código em vez de ajudar.
+
+*   **Gerenciar Conflitos no Código:** Como nós dois mexíamos no código ao mesmo tempo, toda hora dava conflito no Git na hora de juntar as partes. Perder um tempão resolvendo esses conflitos foi normal, e a gente tinha que ter muito cuidado para não apagar o trabalho do outro ou quebrar o que já estava funcionando.
+
+---
+
