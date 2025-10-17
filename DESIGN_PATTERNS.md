@@ -14,6 +14,8 @@ Este documento detalha os padrões de projeto de software identificados no códi
 
 *   **Contexto de Uso:** O padrão State foi utilizado para gerenciar o ciclo de vida de uma `Consulta`. Uma consulta pode passar por diversos estados, como `Criada`, `Em Andamento`, `Finalizada`, `Cancelada` e `Reagendada`. As ações que podem ser executadas em uma consulta (como iniciar, finalizar, cancelar) dependem diretamente do seu estado atual. A interface `ConsultaState` define as operações, e classes concretas como `CriadaState`, `EmAndamentoState`, etc., implementam o comportamento específico para cada estado.
 
+*   **Justificativa de Encaixe:** O gerenciamento do ciclo de vida de uma `Consulta` é um caso de uso clássico para o padrão State. Como as regras de negócio para o que pode ser feito com uma consulta (cancelar, finalizar, etc.) mudam drasticamente dependendo de seu estado atual, o padrão State organiza essa lógica de forma limpa e coesa. A alternativa, um método monolítico com `if-else` ou `switch` na classe `Consulta`, seria difícil de manter e estender.
+
 *   **Benefícios:**
     *   **Organização do Código:** Evita o uso de grandes e complexas estruturas condicionais (`if/else` ou `switch`) na classe `Consulta` para verificar o estado atual antes de executar uma ação.
     *   **Coesão:** Agrupa o comportamento relacionado a um estado específico em sua própria classe, tornando o código mais limpo e coeso.
@@ -27,6 +29,8 @@ Este documento detalha os padrões de projeto de software identificados no códi
 #### **2. Padrão Strategy**
 
 *   **Contexto de Uso:** O padrão Strategy é empregado no sistema de pagamento. A aplicação precisa lidar com múltiplas formas de pagamento (`Cartão`, `Pix`, `Dinheiro`). A interface `PagamentoStrategy` define um método comum (`pagar`), e as classes `PagamentoCartao`, `PagamentoPix` e `PagamentoDinheiro` fornecem as implementações concretas. O `ConsultaController` seleciona a estratégia de pagamento em tempo de execução com base na escolha do usuário.
+
+*   **Justificativa de Encaixe:** O sistema precisava de flexibilidade para processar diferentes formas de pagamento, e a escolha do método é feita em tempo de execução. O padrão Strategy foi ideal porque isolou a lógica de cada método de pagamento em sua própria classe, desacoplando o `ConsultaController` dos detalhes de implementação. Isso torna o sistema aderente ao Princípio Aberto/Fechado, pois novos métodos de pagamento podem ser adicionados sem alterar o código existente.
 
 *   **Benefícios:**
     *   **Flexibilidade e Desacoplamento:** Permite que o algoritmo de pagamento seja selecionado dinamicamente. A classe `Consulta` não precisa conhecer os detalhes de cada método de pagamento, apenas interagir com a interface `PagamentoStrategy`.
@@ -42,6 +46,8 @@ Este documento detalha os padrões de projeto de software identificados no códi
 
 *   **Contexto de Uso:** O padrão Singleton é utilizado nas classes `DataManager` (ex: `ConsultaDataManager.getInstance()`). Ele garante que exista apenas uma única instância dessas classes em toda a aplicação.
 
+*   **Justificativa de Encaixe:** Para garantir a consistência e a integridade dos dados, era crucial que houvesse apenas um ponto de acesso e manipulação dos arquivos de persistência (`.dat`). O padrão Singleton foi a escolha natural para as classes `DataManager`, pois ele impõe a existência de uma única instância, evitando conflitos de acesso e garantindo que todas as partes do sistema trabalhem com a mesma fonte de dados.
+
 *   **Benefícios:**
     *   **Ponto de Acesso Global:** Fornece um ponto de acesso único e global para a fonte de dados, evitando a criação de múltiplos gerenciadores que poderiam competir pelo acesso ao mesmo arquivo (`.dat`), causando inconsistências.
     *   **Gerenciamento de Estado Único:** Garante que o estado do gerenciador de dados seja consistente em toda a aplicação.
@@ -55,6 +61,8 @@ Este documento detalha os padrões de projeto de software identificados no códi
 #### **4. Padrão Command**
 
 *   **Contexto de Uso:** O padrão Command é usado para encapsular as ações dos botões da interface gráfica (Inserir, Atualizar, Excluir) no `ConsultaController`. Cada ação é implementada como uma classe de Comando separada (ex: `InserirConsultaCommand`, `AtualizarConsultaCommand`), que implementa a interface `Command`. O botão (invocador) é configurado para executar um objeto de comando, que por sua vez chama a ação correspondente no `ConsultaController` (receptor).
+
+*   **Justificativa de Encaixe:** A interação do usuário com a interface gráfica (clicar em botões de "Inserir", "Excluir") precisava ser desacoplada da lógica de negócio que executa essas operações. O padrão Command encapsula cada solicitação como um objeto, permitindo que a UI (invocador) não conheça os detalhes do receptor (`ConsultaController`). Isso não apenas limpa o código, mas também abre caminho para futuras extensões, como adicionar funcionalidades de log de ações ou um sistema de desfazer/refazer.
 
 *   **Benefícios:**
     *   **Desacoplamento Forte:** A refatoração para classes separadas tornou o desacoplamento ainda mais explícito. O "invocador" (o botão) é completamente independente do "receptor" (o `ConsultaController`). O botão apenas executa o método `execute()` de qualquer objeto que implemente `Command`.
